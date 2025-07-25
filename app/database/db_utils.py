@@ -3,11 +3,12 @@ Database configuration and session management.
 Implements proper SQLAlchemy setup with connection pooling and session management.
 """
 
+import logging
+from typing import Generator
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from typing import Generator
-import logging
+from sqlalchemy.orm import Session, sessionmaker
 
 from app.config import settings
 
