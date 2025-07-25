@@ -19,14 +19,17 @@ from app.utils.exceptions import (
     create_http_exception
 )
 import logging
+from app.utils.timezone_utils import tz_manager
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1", tags=["bookings"])
 
+
 @router.get("/classes", response_model=List[FitnessClassResponse])
 async def get_classes(
-    timezone: Optional[str] = Query(None, description="Target timezone (e.g., 'America/New_York')"),
+    timezone: Optional[str] = Query("Asia/Kolkata", description="Target timezone (e.g., 'America/New_York')"),
     db: Session = Depends(get_db)
 ):
     """
@@ -97,7 +100,9 @@ async def create_booking(
                 "name": booking.fitness_class.name,
                 "description": booking.fitness_class.description,
                 "instructor": booking.fitness_class.instructor,
-                "class_datetime": booking.fitness_class.class_datetime,
+                "class_datetime": tz_manager.convert_timezone(
+                        booking.fitness_class.class_datetime, settings.DEFAULT_TIMEZONE
+                    ),
                 "duration_minutes": booking.fitness_class.duration_minutes,
                 "max_slots": booking.fitness_class.max_slots,
                 "available_slots": booking.fitness_class.available_slots,
@@ -155,7 +160,9 @@ async def get_bookings(
                     "name": booking.fitness_class.name,
                     "description": booking.fitness_class.description,
                     "instructor": booking.fitness_class.instructor,
-                    "class_datetime": booking.fitness_class.class_datetime,
+                    "class_datetime":tz_manager.convert_timezone(
+                        booking.fitness_class.class_datetime, settings.DEFAULT_TIMEZONE
+                    ) ,
                     "duration_minutes": booking.fitness_class.duration_minutes,
                     "max_slots": booking.fitness_class.max_slots,
                     "available_slots": booking.fitness_class.available_slots,

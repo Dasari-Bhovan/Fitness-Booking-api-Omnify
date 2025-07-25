@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from datetime import datetime
 from typing import Optional
-
+from app.utils.timezone_utils import tz_manager
 from app.database.db_utils import Base
 
 
@@ -48,7 +48,7 @@ class FitnessClass(Base):
     @property
     def is_past(self) -> bool:
         """Check if class datetime has passed."""
-        return self.class_datetime < datetime.now()
+        return self.class_datetime < datetime.now(tz=tz_manager.default_tz)
 
 
 class Booking(Base):

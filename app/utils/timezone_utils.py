@@ -3,7 +3,7 @@ Timezone utilities for handling datetime conversions across different timezones.
 Implements the requirement for timezone management with IST as base.
 """
 
-from datetime import datetime
+from datetime import datetime,timedelta
 from typing import Optional
 import pytz
 from app.config import settings
@@ -57,7 +57,11 @@ class TimezoneManager:
         """Get current time in specified timezone."""
         tz = pytz.timezone(timezone) if timezone else self.default_tz
         return datetime.now(tz)
-
+    
+    def get_one_day_aheadtime(self, timezone: Optional[str] = None) -> datetime:
+        """Get current time in specified timezone."""
+        tz = pytz.timezone(timezone) if timezone else self.default_tz
+        return datetime.now(tz)+timedelta(days=1)
 
 # Global timezone manager instance
 tz_manager = TimezoneManager()

@@ -19,6 +19,7 @@ from ..utils.exceptions import (
 )
 from ..utils.timezone_utils import tz_manager
 import logging
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,7 @@ class BookingService:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_all_classes(self, timezone: Optional[str] = None) -> List[FitnessClass]:
+    def get_all_classes(self, timezone: Optional[str] = "Asia/Kolkata") -> List[FitnessClass]:
         """
         Retrieve all upcoming active fitness classes.
         
@@ -86,6 +87,9 @@ class BookingService:
                 f"Class with ID {class_id} not found or inactive",
                 {"class_id": class_id}
             )
+        fitness_class.class_datetime = tz_manager.convert_timezone(
+                        fitness_class.class_datetime,settings.DEFAULT_TIMEZONE 
+                    )
         
         return fitness_class
     
@@ -160,6 +164,7 @@ class BookingService:
             self.db.refresh(new_booking)
             
             logger.info(f"Booking created successfully: {booking_reference}")
+            print(new_booking,"as d")
             return new_booking
             
         except (ClassNotFoundException, NoSlotsAvailableException, 
@@ -198,6 +203,7 @@ class BookingService:
         try:
             # Check if classes already exist
             existing_classes = self.db.query(FitnessClass).count()
+            print(existing_classes)
             if existing_classes > 0:
                 logger.info("Sample classes already exist")
                 return
@@ -208,27 +214,30 @@ class BookingService:
                     "name": "Morning Yoga",
                     "description": "Start your day with peaceful yoga practice",
                     "instructor": "Sarah Johnson",
-                    "class_datetime": tz_manager.get_current_time().replace(hour=8, minute=0, second=0, microsecond=0),
+                    "class_datetime": tz_manager.get_one_day_aheadtime().replace(hour=8, minute=0, second=0, microsecond=0),
                     "duration_minutes": 60,
                     "max_slots": 15,
+                    "is_active":True,
                     "available_slots": 15
                 },
                 {
                     "name": "High Energy Zumba",
                     "description": "Dance your way to fitness with energetic Zumba",
                     "instructor": "Carlos Rodriguez",
-                    "class_datetime": tz_manager.get_current_time().replace(hour=18, minute=30, second=0, microsecond=0),
+                    "class_datetime": tz_manager.get_one_day_aheadtime().replace(hour=18, minute=30, second=0, microsecond=0),
                     "duration_minutes": 45,
                     "max_slots": 20,
+                    "is_active":True,
                     "available_slots": 20
                 },
                 {
                     "name": "HIIT Intensive",
                     "description": "High-intensity interval training for maximum results",
                     "instructor": "Mike Thompson",
-                    "class_datetime": tz_manager.get_current_time().replace(hour=19, minute=0, second=0, microsecond=0),
+                    "class_datetime": tz_manager.get_one_day_aheadtime().replace(hour=19, minute=0, second=0, microsecond=0),
                     "duration_minutes": 30,
                     "max_slots": 12,
+                    "is_active":True,
                     "available_slots": 12
                 }
             ]

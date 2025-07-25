@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, EmailStr, validator, root_validator
 from datetime import datetime
 from typing import Optional, List
 from enum import Enum
-
+from app.utils.timezone_utils import tz_manager
 
 class BookingStatus(str, Enum):
     """Enumeration for booking status."""
@@ -36,7 +36,8 @@ class FitnessClassBase(BaseModel):
     
     @validator('class_datetime')
     def validate_future_datetime(cls, v):
-        if v <= datetime.now():
+        print(v, datetime.now(tz=tz_manager.default_tz))
+        if v <= datetime.now(tz=tz_manager.default_tz):
             raise ValueError('Class datetime must be in the future')
         return v
 
